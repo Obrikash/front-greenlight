@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient, Movie, API_BASE_URL, getMovies, MovieQueryParams } from '../api/client';
@@ -24,6 +24,7 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
   const { signOut } = useAuth();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   
   // Get search parameters from URL
   const initialTitle = searchParams.get('title') || '';
@@ -34,21 +35,22 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
   const [searchTitle, setSearchTitle] = useState(initialTitle);
   const [sortBy, setSortBy] = useState(initialSort);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [isSearching, setIsSearching] = useState(false);
+  const [debouncedTitle, setDebouncedTitle] = useState(initialTitle);
   
   // Build query parameters based on state
   const queryParams: MovieQueryParams = {
     page: currentPage
   };
   
-  if (searchTitle) {
-    queryParams.title = searchTitle;
+  if (debouncedTitle) {
+    queryParams.title = debouncedTitle;
   }
   
   if (sortBy) {
     queryParams.sort = sortBy;
   }
 
+  // Fetch movies with query parameters
   const { data, isLoading, error } = useQuery({
     queryKey: ['movies', queryParams],
     queryFn: async () => {
@@ -57,29 +59,52 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
     },
   });
 
-  // Update URL when search params change
+  // Only update URL when sort or page changes
+  // (title will be updated only on form submit)
   useEffect(() => {
-    const params = new URLSearchParams();
-    
-    if (searchTitle) {
-      params.set('title', searchTitle);
-    }
+    const params = new URLSearchParams(searchParams);
     
     if (sortBy) {
       params.set('sort', sortBy);
+    } else {
+      params.delete('sort');
     }
     
     if (currentPage > 1) {
       params.set('page', currentPage.toString());
+    } else {
+      params.delete('page');
     }
     
     setSearchParams(params);
-  }, [searchTitle, sortBy, currentPage, setSearchParams]);
+  }, [sortBy, currentPage, setSearchParams, searchParams]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSearching(false);
-    setCurrentPage(1); // Reset to first page on new search
+    
+    // Update the debounced title for the query
+    setDebouncedTitle(searchTitle);
+    
+    // Update the URL with the search term
+    const params = new URLSearchParams(searchParams);
+    if (searchTitle) {
+      params.set('title', searchTitle);
+    } else {
+      params.delete('title');
+    }
+    
+    // Reset to first page on new search
+    setCurrentPage(1);
+    if (currentPage !== 1) {
+      params.delete('page');
+    }
+    
+    setSearchParams(params);
+    
+    // Keep focus on search input after submit
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
   };
 
   const handleMovieAdded = () => {
@@ -124,11 +149,9 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
                 id="search-title"
                 type="text"
                 placeholder="Поиск фильма..."
-                value={isSearching ? searchTitle : initialTitle}
-                onChange={(e) => {
-                  setSearchTitle(e.target.value);
-                  setIsSearching(true);
-                }}
+                value={searchTitle}
+                ref={searchInputRef}
+                onChange={(e) => setSearchTitle(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
@@ -170,7 +193,7 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
             ? 'Фильмов не найдено'
             : `Найдено ${data.metadata.total_records} фильм(ов)`
           }
-          {searchTitle && ` по запросу "${searchTitle}"`}
+          {debouncedTitle && ` по запросу "${debouncedTitle}"`}
         </div>
       )}
       
@@ -208,8 +231,8 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
         ) : (
           <div className="col-span-full text-center py-10">
             <p className="text-gray-500">
-              {searchTitle 
-                ? `Фильмы не найдены по запросу "${searchTitle}". Попробуйте изменить параметры поиска.` 
+              {debouncedTitle 
+                ? `Фильмы не найдены по запросу "${debouncedTitle}". Попробуйте изменить параметры поиска.` 
                 : 'Фильмы не найдены. Добавьте свой первый фильм!'}
             </p>
           </div>

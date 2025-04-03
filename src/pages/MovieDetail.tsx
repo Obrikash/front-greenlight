@@ -9,6 +9,8 @@ interface MovieDetailResponse {
   is_favourite: boolean;
 }
 
+type FavoriteAction = 'add' | 'remove' | null;
+
 export const MovieDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -17,6 +19,7 @@ export const MovieDetail: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [actionSuccess, setActionSuccess] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [lastAction, setLastAction] = useState<FavoriteAction>(null);
 
   const { data, isLoading, error } = useQuery<MovieDetailResponse>({
     queryKey: ['movie', id],
@@ -56,11 +59,13 @@ export const MovieDetail: React.FC = () => {
         console.log('Attempting to remove from favorites');
         response = await removeMovieFromFavorites(parseInt(id));
         console.log('Removed from favorites:', response);
+        setLastAction('remove');
       } else {
         // Add to favorites
         console.log('Attempting to add to favorites');
         response = await addMovieToFavorites(parseInt(id));
         console.log('Added to favorites:', response);
+        setLastAction('add');
       }
       
       setActionSuccess(true);
@@ -161,7 +166,7 @@ export const MovieDetail: React.FC = () => {
                     {isProcessing 
                       ? (isFavorite ? 'Удаление...' : 'Добавление...') 
                       : actionSuccess 
-                        ? (isFavorite ? '✓ Удалено из избранного' : '✓ Добавлено в избранное') 
+                        ? (lastAction === 'add' ? '✓ Добавлено в избранное' : '✓ Удалено из избранного') 
                         : (isFavorite ? 'Удалить из избранного' : 'В избранное')}
                   </button>
                 </div>
