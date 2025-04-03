@@ -1,24 +1,91 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { apiClient, Movie, API_BASE_URL } from '../api/client';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiClient, Movie, API_BASE_URL, addMovieToFavorites, removeMovieFromFavorites } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
+
+interface MovieDetailResponse {
+  movie: Movie;
+  is_favourite: boolean;
+}
 
 export const MovieDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { signOut } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [actionSuccess, setActionSuccess] = useState(false);
+  const [actionError, setActionError] = useState('');
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<MovieDetailResponse>({
     queryKey: ['movie', id],
     queryFn: async () => {
       const response = await apiClient.get(`/movies/${id}`);
+      console.log('Movie API response:', response.data);
       return response.data;
     },
   });
 
+  useEffect(() => {
+    if (data) {
+      console.log('Movie data received:', data.movie);
+      console.log('Is favourite status (from response):', data.is_favourite);
+    }
+  }, [data]);
+
   const handleBack = () => {
     navigate('/');
+  };
+
+  const handleFavoriteAction = async () => {
+    if (!id || isProcessing || !data) return;
+    
+    const isFavorite = data.is_favourite === true;
+    
+    console.log('Current favorite status:', isFavorite);
+    
+    try {
+      setIsProcessing(true);
+      setActionError('');
+      setActionSuccess(false);
+      
+      let response;
+      if (isFavorite) {
+        // Remove from favorites
+        console.log('Attempting to remove from favorites');
+        response = await removeMovieFromFavorites(parseInt(id));
+        console.log('Removed from favorites:', response);
+      } else {
+        // Add to favorites
+        console.log('Attempting to add to favorites');
+        response = await addMovieToFavorites(parseInt(id));
+        console.log('Added to favorites:', response);
+      }
+      
+      setActionSuccess(true);
+      
+      // Update the cached movie data to reflect the new favorite status
+      queryClient.setQueryData<MovieDetailResponse>(['movie', id], (oldData) => {
+        if (!oldData) return undefined;
+        return {
+          ...oldData,
+          is_favourite: !isFavorite
+        };
+      });
+      
+      // Reset success message after 3 seconds
+      setTimeout(() => {
+        setActionSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Error managing favorites:', err);
+      setActionError(isFavorite 
+        ? 'Не удалось удалить фильм из избранного' 
+        : 'Не удалось добавить фильм в избранное');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (isLoading) {
@@ -37,15 +104,19 @@ export const MovieDetail: React.FC = () => {
     );
   }
 
-  const movie: Movie = data?.movie;
-
-  if (!movie) {
+  if (!data || !data.movie) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl text-red-600">Фильм не найден</div>
       </div>
     );
   }
+
+  const movie = data.movie;
+  
+  // Ensure we're correctly checking the is_favourite status from the response
+  const isFavorite = data.is_favourite === true;
+  console.log('Rendering with favorite status:', isFavorite, 'Raw value:', data.is_favourite);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -73,7 +144,40 @@ export const MovieDetail: React.FC = () => {
                 </div>
               )}
               <div className="p-6 md:w-2/3">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{movie.title}</h1>
+                <div className="flex justify-between items-start">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{movie.title}</h1>
+                  
+                  <button
+                    onClick={handleFavoriteAction}
+                    disabled={isProcessing}
+                    className={`ml-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md 
+                      ${actionSuccess 
+                        ? 'bg-green-600 hover:bg-green-700 text-white' 
+                        : isFavorite 
+                          ? 'bg-red-600 hover:bg-red-700 text-white'
+                          : 'bg-pink-600 hover:bg-pink-700 text-white'
+                      } transition-colors duration-300 disabled:opacity-50`}
+                  >
+                    {isProcessing 
+                      ? (isFavorite ? 'Удаление...' : 'Добавление...') 
+                      : actionSuccess 
+                        ? (isFavorite ? '✓ Удалено из избранного' : '✓ Добавлено в избранное') 
+                        : (isFavorite ? 'Удалить из избранного' : 'В избранное')}
+                  </button>
+                </div>
+                
+                {actionError && (
+                  <div className="mt-2 text-sm text-red-600">
+                    {actionError}
+                  </div>
+                )}
+                
+                {isFavorite && !actionSuccess && !actionError && (
+                  <div className="mt-2 text-sm text-green-600">
+                    ★ Этот фильм в вашем избранном
+                  </div>
+                )}
+                
                 <div className="text-sm text-gray-500 mb-4">
                   {movie.year} • {movie.runtime} • {movie.genres.join(', ')}
                 </div>

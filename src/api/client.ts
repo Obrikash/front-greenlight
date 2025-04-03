@@ -72,6 +72,7 @@ export interface Movie {
   genres: string[];
   version: number;
   image?: string;
+  is_favourite?: boolean;
 }
 
 export interface MoviesResponse {
@@ -83,4 +84,20 @@ export interface MoviesResponse {
     total_records: number;
   };
   movies: Movie[];
-} 
+}
+
+export interface FavoriteMovieResponse {
+  message: string;
+}
+
+// Function to add a movie to favorites
+export const addMovieToFavorites = async (movieId: number): Promise<FavoriteMovieResponse> => {
+  const response = await apiClient.post<FavoriteMovieResponse>(`/movies/${movieId}`);
+  return response.data;
+};
+
+// Function to remove a movie from favorites
+export const removeMovieFromFavorites = async (movieId: number): Promise<FavoriteMovieResponse> => {
+  const response = await apiClient.delete<FavoriteMovieResponse>(`/movies/${movieId}`);
+  return response.data;
+}; 
