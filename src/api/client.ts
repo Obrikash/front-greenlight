@@ -90,6 +90,13 @@ export interface FavoriteMovieResponse {
   message: string;
 }
 
+export interface MovieQueryParams {
+  title?: string;
+  sort?: string;
+  page?: number;
+  page_size?: number;
+}
+
 // Function to add a movie to favorites
 export const addMovieToFavorites = async (movieId: number): Promise<FavoriteMovieResponse> => {
   const response = await apiClient.post<FavoriteMovieResponse>(`/movies/${movieId}`);
@@ -105,5 +112,11 @@ export const removeMovieFromFavorites = async (movieId: number): Promise<Favorit
 // Function to get user's favorite movies
 export const getFavoriteMovies = async (): Promise<MoviesResponse> => {
   const response = await apiClient.get<MoviesResponse>('/users/movies');
+  return response.data;
+};
+
+// Function to get movies with filtering, sorting and pagination
+export const getMovies = async (params: MovieQueryParams = {}): Promise<MoviesResponse> => {
+  const response = await apiClient.get<MoviesResponse>('/movies', { params });
   return response.data;
 }; 
