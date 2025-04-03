@@ -12,7 +12,7 @@ export const AccountActivation: React.FC = () => {
   
   useEffect(() => {
     console.log('AccountActivation component mounted');
-    document.title = 'Activate Your Account';
+    document.title = 'Активация Аккаунта';
   }, []);
 
   const handleTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +34,29 @@ export const AccountActivation: React.FC = () => {
       }, 3000);
     } catch (err: any) {
       console.error('Account activation error:', err);
-      setError(err.response?.data?.error || 'Failed to activate account. Please try again.');
+      
+      // More robust error handling
+      let errorMessage = 'Не удалось активировать аккаунт. Пожалуйста, попробуйте снова.';
+      
+      if (err.response) {
+        console.log('Error response data:', err.response.data);
+        
+        // Check for different error formats
+        if (typeof err.response.data.error === 'string') {
+          errorMessage = err.response.data.error;
+        } else if (typeof err.response.data.error === 'object') {
+          // Handle nested error objects like { error: { token: "must be 26 bytes long" } }
+          const errorObj = err.response.data.error;
+          if (errorObj.token) {
+            errorMessage = `Ошибка токена: ${errorObj.token}`;
+          } else {
+            // Join all error messages if there are multiple
+            errorMessage = Object.values(errorObj).join(', ');
+          }
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -44,10 +66,10 @@ export const AccountActivation: React.FC = () => {
     <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
       <div>
         <h2 className="text-center text-3xl font-extrabold text-gray-900">
-          Activate Your Account
+          Активация Аккаунта
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Please enter the activation token you received by email
+          Пожалуйста, введите токен активации, который вы получили по электронной почте
         </p>
       </div>
 
@@ -61,10 +83,10 @@ export const AccountActivation: React.FC = () => {
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-green-800">
-                Account activated successfully!
+                Аккаунт успешно активирован!
               </h3>
               <div className="mt-2 text-sm text-green-700">
-                <p>You will be redirected to the sign in page in a few seconds.</p>
+                <p>Вы будете перенаправлены на страницу входа через несколько секунд.</p>
               </div>
             </div>
           </div>
@@ -78,7 +100,7 @@ export const AccountActivation: React.FC = () => {
           )}
           <div>
             <label htmlFor="token" className="sr-only">
-              Activation Token
+              Токен активации
             </label>
             <input
               id="token"
@@ -86,7 +108,7 @@ export const AccountActivation: React.FC = () => {
               type="text"
               required
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Enter your activation token"
+              placeholder="Введите ваш токен активации"
               value={token}
               onChange={handleTokenChange}
             />
@@ -98,7 +120,7 @@ export const AccountActivation: React.FC = () => {
               disabled={isSubmitting}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {isSubmitting ? 'Activating...' : 'Activate Account'}
+              {isSubmitting ? 'Активация...' : 'Активировать аккаунт'}
             </button>
           </div>
         </form>
@@ -106,7 +128,7 @@ export const AccountActivation: React.FC = () => {
       
       <div className="mt-6 text-center">
         <Link to="/signin" className="text-indigo-600 hover:text-indigo-500">
-          Already have an activated account? Sign in
+          Уже активировали аккаунт? Войти
         </Link>
       </div>
     </div>

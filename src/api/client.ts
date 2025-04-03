@@ -52,6 +52,18 @@ export interface AuthResponse {
   authentication_token: string;
 }
 
+export interface User {
+  id: number;
+  created_at: string;
+  name: string;
+  email: string;
+  activated: boolean;
+}
+
+export interface UserProfileResponse {
+  user: User;
+}
+
 export interface Movie {
   id: number;
   title: string;

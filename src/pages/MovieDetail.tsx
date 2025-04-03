@@ -24,7 +24,7 @@ export const MovieDetail: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+        <div className="text-xl">Загрузка...</div>
       </div>
     );
   }
@@ -32,7 +32,7 @@ export const MovieDetail: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-red-600">Error loading movie details</div>
+        <div className="text-xl text-red-600">Ошибка загрузки информации о фильме</div>
       </div>
     );
   }
@@ -42,22 +42,20 @@ export const MovieDetail: React.FC = () => {
   if (!movie) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-red-600">Movie not found</div>
+        <div className="text-xl text-red-600">Фильм не найден</div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      
-
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
           <button
             onClick={handleBack}
             className="mb-6 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 border-indigo-600"
           >
-            &larr; Back to Movies
+            &larr; Назад к фильмам
           </button>
 
           <div className="bg-white shadow overflow-hidden rounded-lg">
@@ -69,7 +67,7 @@ export const MovieDetail: React.FC = () => {
                     alt={movie.title}
                     className="w-full h-auto object-cover"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=No+Image';
+                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=Нет+Изображения';
                     }}
                   />
                 </div>
@@ -83,15 +81,15 @@ export const MovieDetail: React.FC = () => {
                 <div className="border-t border-gray-200 pt-4 mt-4">
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Year</dt>
+                      <dt className="text-sm font-medium text-gray-500">Год</dt>
                       <dd className="mt-1 text-sm text-gray-900">{movie.year}</dd>
                     </div>
                     <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Runtime</dt>
+                      <dt className="text-sm font-medium text-gray-500">Продолжительность</dt>
                       <dd className="mt-1 text-sm text-gray-900">{movie.runtime}</dd>
                     </div>
                     <div className="sm:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">Genres</dt>
+                      <dt className="text-sm font-medium text-gray-500">Жанры</dt>
                       <dd className="mt-1 text-sm text-gray-900">
                         <div className="flex flex-wrap gap-2">
                           {movie.genres.map((genre) => (

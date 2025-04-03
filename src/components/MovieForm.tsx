@@ -57,7 +57,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
       onSuccess();
     } catch (err: any) {
       console.error('Movie creation error:', err);
-      setError(err.response?.data?.error || 'Failed to create movie');
+      setError(err.response?.data?.error || 'Не удалось создать фильм');
     } finally {
       setIsSubmitting(false);
     }
@@ -65,7 +65,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-      <h2 className="text-lg font-semibold mb-4">Add New Movie</h2>
+      <h2 className="text-lg font-semibold mb-4">Добавить новый фильм</h2>
       
       {error && (
         <div className="mb-4 p-3 bg-red-50 text-red-700 rounded">
@@ -77,7 +77,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-              Title
+              Название
             </label>
             <input
               type="text"
@@ -92,7 +92,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
           
           <div>
             <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
-              Year
+              Год
             </label>
             <input
               type="number"
@@ -109,7 +109,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
           
           <div>
             <label htmlFor="runtime" className="block text-sm font-medium text-gray-700 mb-1">
-              Runtime (e.g. "107 mins")
+              Продолжительность (напр. "107 мин")
             </label>
             <input
               type="text"
@@ -118,14 +118,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
               value={formData.runtime}
               onChange={handleChange}
               required
-              placeholder="107 mins"
+              placeholder="107 мин"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
           
           <div>
             <label htmlFor="genres" className="block text-sm font-medium text-gray-700 mb-1">
-              Genres (comma separated)
+              Жанры (через запятую)
             </label>
             <input
               type="text"
@@ -134,14 +134,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
               value={formData.genres}
               onChange={handleChange}
               required
-              placeholder="Animation, Adventure, Comedy"
+              placeholder="Анимация, Приключения, Комедия"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
           
           <div className="md:col-span-2">
             <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-              Image URL
+              URL изображения
             </label>
             <input
               type="text"
@@ -149,7 +149,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
               name="image"
               value={formData.image}
               onChange={handleChange}
-              placeholder="movie-poster.jpg"
+              placeholder="постер-фильма.jpg"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
@@ -161,7 +161,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
             disabled={isSubmitting}
             className="w-full px-4 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
-            {isSubmitting ? 'Creating...' : 'Create Movie'}
+            {isSubmitting ? 'Создание...' : 'Создать фильм'}
           </button>
         </div>
       </form>

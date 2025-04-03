@@ -9,6 +9,7 @@ import { SignUp } from './pages/SignUp';
 import { AccountActivation } from './pages/AccountActivation';
 import { Movies } from './pages/Movies';
 import { MovieDetail } from './pages/MovieDetail';
+import { Profile } from './pages/Profile';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,6 +47,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <MovieDetail />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Profile />
                   </Layout>
                 </ProtectedRoute>
               }

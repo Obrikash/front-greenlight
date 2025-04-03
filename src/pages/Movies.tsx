@@ -43,11 +43,11 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
   };
 
   if (isLoading) {
-    return <div className="text-xl text-center py-10">Loading movies...</div>;
+    return <div className="text-xl text-center py-10">Загрузка фильмов...</div>;
   }
 
   if (error) {
-    return <div className="text-xl text-center text-red-600 py-10">Error loading movies</div>;
+    return <div className="text-xl text-center text-red-600 py-10">Ошибка загрузки фильмов</div>;
   }
 
   return (
@@ -69,7 +69,7 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
                     alt={movie.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=No+Image';
+                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Нет+Изображения';
                     }}
                   />
                 </div>
@@ -77,16 +77,16 @@ export const Movies: React.FC<MoviesProps> = ({ showForm = false }) => {
               <div className="p-5">
                 <h3 className="text-lg font-medium text-gray-900">{movie.title}</h3>
                 <div className="mt-2 text-sm text-gray-500">
-                  <p>Year: {movie.year}</p>
-                  <p>Runtime: {movie.runtime}</p>
-                  <p>Genres: {movie.genres.join(', ')}</p>
+                  <p>Год: {movie.year}</p>
+                  <p>Продолжительность: {movie.runtime}</p>
+                  <p>Жанры: {movie.genres.join(', ')}</p>
                 </div>
               </div>
             </div>
           ))
         ) : (
           <div className="col-span-full text-center py-10">
-            <p className="text-gray-500">No movies found. Add your first movie!</p>
+            <p className="text-gray-500">Фильмы не найдены. Добавьте свой первый фильм!</p>
           </div>
         )}
       </div>
