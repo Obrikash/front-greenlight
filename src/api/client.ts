@@ -14,20 +14,30 @@ export const apiClient = axios.create({
 // Add auth token to requests
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
+  console.log(`API Request to: ${config.url}`);
   if (token) {
-    console.log('Adding token to request:', config.url);
+    console.log(`Auth token found for request to: ${config.url}`);
     config.headers.Authorization = `Bearer ${token}`;
   } else {
-    console.log('No token available for request:', config.url);
+    console.log(`No auth token for request to: ${config.url}`);
   }
   return config;
 });
 
 // Add response interceptor for better error logging
 apiClient.interceptors.response.use(
-  response => response,
+  response => {
+    console.log(`API Response from ${response.config.url}:`, response.status);
+    return response;
+  },
   error => {
-    console.error('API Error:', error.response?.data || error.message);
+    if (error.response) {
+      console.error(`API Error ${error.response.status} from ${error.config?.url}:`, error.response.data);
+    } else if (error.request) {
+      console.error(`API No Response from ${error.config?.url}:`, error.request);
+    } else {
+      console.error(`API Request Error:`, error.message);
+    }
     return Promise.reject(error);
   }
 );

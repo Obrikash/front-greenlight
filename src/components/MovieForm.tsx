@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiClient } from '../api/client';
 
 interface MovieFormProps {
@@ -6,6 +6,7 @@ interface MovieFormProps {
 }
 
 export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
+  console.log('Rendering MovieForm component');
   const [formData, setFormData] = useState({
     title: '',
     year: new Date().getFullYear(),
@@ -15,6 +16,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    console.log('MovieForm component mounted');
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -26,6 +31,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submitting movie:', formData);
     setIsSubmitting(true);
     setError('');
 
@@ -37,7 +43,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
         genres: formData.genres.split(',').map(genre => genre.trim())
       };
 
-      await apiClient.post('/movies', movieData);
+      console.log('Formatted movie data:', movieData);
+      const response = await apiClient.post('/movies', movieData);
+      console.log('Movie created:', response.data);
+      
       setFormData({
         title: '',
         year: new Date().getFullYear(),
@@ -47,6 +56,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSuccess }) => {
       });
       onSuccess();
     } catch (err: any) {
+      console.error('Movie creation error:', err);
       setError(err.response?.data?.error || 'Failed to create movie');
     } finally {
       setIsSubmitting(false);

@@ -93,6 +93,11 @@ export const SignIn: React.FC = () => {
           <Link to="/signup" className="text-indigo-600 hover:text-indigo-500">
             Don't have an account? Sign up
           </Link>
+          <div className="mt-2">
+            <Link to="/activate" className="text-indigo-600 hover:text-indigo-500">
+              Need to activate your account?
+            </Link>
+          </div>
         </div>
       </div>
     </div>

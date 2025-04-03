@@ -18,9 +18,8 @@ export const SignUp: React.FC = () => {
 
     try {
       await signUp(formData);
-      // Show success message about email activation
-      alert('Please check your email to activate your account');
-      navigate('/signin');
+      // Redirect to the activation page instead of showing an alert
+      navigate('/activate');
     } catch (err: any) {
       console.error('Signup error:', err);
       // Display more specific error message if available
