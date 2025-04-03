@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient, Movie, API_BASE_URL } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { MovieForm } from '../components/MovieForm';
 
 export const Movies: React.FC = () => {
+  const navigate = useNavigate();
   const { signOut } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
@@ -22,6 +24,10 @@ export const Movies: React.FC = () => {
     queryClient.invalidateQueries({ queryKey: ['movies'] });
     // Hide the form after successful creation
     setShowForm(false);
+  };
+
+  const handleMovieClick = (movieId: number) => {
+    navigate(`/movies/${movieId}`);
   };
 
   if (isLoading) {
@@ -79,7 +85,8 @@ export const Movies: React.FC = () => {
               data.movies.map((movie: Movie) => (
                 <div
                   key={movie.id}
-                  className="bg-white overflow-hidden shadow rounded-lg"
+                  className="bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => handleMovieClick(movie.id)}
                 >
                   {movie.image && (
                     <div className="w-full h-48 overflow-hidden">

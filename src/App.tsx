@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { SignIn } from './pages/SignIn';
 import { SignUp } from './pages/SignUp';
 import { Movies } from './pages/Movies';
+import { MovieDetail } from './pages/MovieDetail';
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Movies />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/movies/:id"
+              element={
+                <ProtectedRoute>
+                  <MovieDetail />
                 </ProtectedRoute>
               }
             />
