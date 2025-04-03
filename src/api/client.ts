@@ -100,4 +100,10 @@ export const addMovieToFavorites = async (movieId: number): Promise<FavoriteMovi
 export const removeMovieFromFavorites = async (movieId: number): Promise<FavoriteMovieResponse> => {
   const response = await apiClient.delete<FavoriteMovieResponse>(`/movies/${movieId}`);
   return response.data;
+};
+
+// Function to get user's favorite movies
+export const getFavoriteMovies = async (): Promise<MoviesResponse> => {
+  const response = await apiClient.get<MoviesResponse>('/users/movies');
+  return response.data;
 }; 
