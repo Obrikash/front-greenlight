@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:4000/v1';
+export const API_BASE_URL = 'http://localhost:4000';
+const API_PATH = '/v1';
 
 export const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}${API_PATH}`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -48,6 +49,7 @@ export interface Movie {
   runtime: string;
   genres: string[];
   version: number;
+  image?: string;
 }
 
 export interface MoviesResponse {

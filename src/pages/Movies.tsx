@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient, Movie } from '../api/client';
+import { apiClient, Movie, API_BASE_URL } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { MovieForm } from '../components/MovieForm';
 
@@ -81,6 +81,19 @@ export const Movies: React.FC = () => {
                   key={movie.id}
                   className="bg-white overflow-hidden shadow rounded-lg"
                 >
+                  {movie.image && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={`${API_BASE_URL}/assets/${movie.image}`} 
+                        alt={movie.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback if image fails to load
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=No+Image';
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className="p-5">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
